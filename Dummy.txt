@@ -1,0 +1,283 @@
+In Bernoulli's Naive Bayes classification initial steps are the same. We first need to construct our
+dictionary. If the training documents remain same dictionary will be same. Let us reproduce our
+training documents and the dictionary constructed using those documents.
+
+𝐷 1 = Upgrad is a great educational institution
+
+𝐷 2 = Educational greatness depends on ethics
+
+𝐷 3 = A story of great ethics and educational greatness
+
+𝐷 4 =Sholay is a great cinema
+
+𝐷 5 =good movie depends on good story
+
+These documents will give following dictionary vector as we have already seen in the case of
+Multinomial Naive Bayes.
+
+0 1 2 3 4 5 6 7 8 9 10 11
+
+cinema depends educational ethics good great greatness institution movie shola stor upgra
+y y d
+
+Now we need to vectorize our training documents according to this dictionary. Vectorization
+process for Bernoulli's Naive Bayes is different from Multinomial Naive Bayes. Let us first see the
+vectorized feature vector for Multinomial Naive Bayes.
+
+0, 0, 1, 0, 0, 1, 0, 1, 0, 0, 0, 1 
+ 
+0, 1, 1, 1, 0, 0, 1, 0, 0, 0, 0, 0 
+D =  0, 0, 1, 1, 0, 1, 1, 0, 0, 0, 1, 0 
+ 
+1, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0
+ 
+0, 1, 0, 0, 2, 0, 0, 0, 1, 0, 1, 0
+
+Notice a '2' at the bottom row of the matrix. Last row is the feature vector for our fifth document.
+As the fifth document ( 𝐷 5 =good movie depends on good story ) contains word "good" twice , it
+has appeared as 2 in 5th column of the last row. In Multinomial Naive Bayes, feature vectors
+capture the frequency of the words in the document.
+
+Bernoulli's feature vectors are a bit different. It generates a Boolean indicator about each term of
+the vocabulary and equals to 1 if the term belongs to the examining document and 0 if it does
+not. Let us see the feature vector of our document for better understanding.0, 0, 1, 0, 0, 1, 0, 1, 0, 0, 0, 1 
+ 
+0, 1, 1, 1, 0, 0, 1, 0, 0, 0, 0, 0 
+D =  0, 0, 1, 1, 0, 1, 1, 0, 0, 0, 1, 0 
+ 
+1, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0
+ 
+0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0 
+
+See the difference. We have only 0's and 1's. The '2' of the last row has disappeared. We are only
+interested whether a word appears in a document or not.
+
+Thus each document is represented as a 12-dimensional binary vector. Let us separate them acco
+rding to their class.
+
+0, 0, 1, 0, 0, 1, 0, 1, 0, 0, 0, 1
+𝑎𝑎𝑠𝑎𝑎𝑠𝑖𝑙𝑙  
+𝐷 = 0, 1, 1, 1, 0, 0, 1, 0, 0, 0, 0, 0
+ 
+0, 0, 1, 1, 0, 1, 1, 0, 0, 0, 1, 0 
+
+𝑎𝑖𝑙𝑎𝑙𝑎 1, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0
+𝐷     =  
+ 
+0, 1, 0, 0, 2, 0, 0, 0, 1, 0, 1, 0
+
+Now how do we calculate the probability of a word occurring in a class. For example what is the
+probability of the word "ethics" appearing in the class "education”?  Means we are formally
+trying to find outP(w=ethics | C=education). How do we calculate this? Not as we did while
+calculating the same expression in Multinomial Naive Bayes. It is calculated using following
+formula
+
+n education  w ethics 
+P (w=ethics | C=education)=
+N education
+. n education  w ethics  means total no of word "ethics" in all the documents of class "education" and
+N education means total no of documents in class " education". n education  w ethics  our example is 2 and
+N education  is 3. So, the probability of the word "ethics" appearing in the class "education" is
+n education  w ethics  2
+=  .
+N education 3Now let us make a table showing probability of all the words in all the classes of documents using
+our feature vector of documents as we did for Multinomial Naive Bayes.
+
+n education  w  p  w | c  education  n cinema  w  p  w | c  cinema 
+
+𝑤 1 = cinema 0 0 1 1/2
+
+𝑤 2 = depends 1 1/3 1 1/2
+
+𝑤 3 = educational 3 3/3 =1 0 0
+
+𝑤 4 = ethics 2 2/3 0 0
+
+𝑤 5 = good 0 0 2 2/2=1
+
+𝑤 6 = great 2 2/3 1 1/2
+
+𝑤 7 = greatness 2 2/3 0 0
+
+𝑤 8 = institution 1 1/3 0 0
+
+𝑤 9 = movie 0 0 1 1/2
+
+𝑤 10 = sholey 0 0 1 1/2
+
+𝑤 11 = story 1 1/3 1 1/2
+
+𝑤 12 = upgrad 1 1/3 0 0
+
+Suppose we want to classify following document into "education" or "cinema".
+
+“very good educational institution”
+
+Let us first recall our Bayes’s formula written to suit hour this discussion.
+
+Likelihood Prior
+
+P  C | 1 , w 2 ,.... w n   P  w 1 , w 2 ,.... w n | C  * P  C 
+w P  w 1 , w 2 ,.... w n 
+Normalization Constant
+Posterior
+
+d
+
+hoodDenominator of the right-hand side expression is generally ignored as that will be same for all
+cases and hence doesn’t affect the final outcome. Let us calculate the “Prior”. “Prior” is our prior
+knowledge of probability of a document of belonging to a certain class. For this discussion we will
+restrict to two classes “education” and “cinema”. So what is the probability of a document
+belonging to “education “class?
+
+P  education   # 𝑙𝑎 𝑎𝑙𝑎𝑠𝑙𝑎𝑙𝑠 𝑎𝑎𝑙𝑙𝑙𝑎𝑖𝑙𝑎 𝑠𝑙 𝑠ℎ𝑎 𝑎𝑙𝑎𝑠𝑠 "𝑎𝑎𝑠𝑎𝑎𝑠𝑖𝑙𝑙"
+# 𝑙𝑎 𝑠𝑙𝑠𝑎𝑙 𝑎𝑙𝑎𝑠𝑙𝑎𝑙𝑠𝑠
+
+= 3 = 0.6
+5
+
+Similarly
+
+P  cinema   # 𝑙𝑎 𝑎𝑙𝑎𝑠𝑙𝑎𝑙𝑠 𝑎𝑎𝑙𝑙𝑙𝑎𝑖𝑙𝑎 𝑠𝑙 𝑠ℎ𝑎 𝑎𝑙𝑎𝑠𝑠 "𝑎𝑖𝑙𝑎𝑙𝑎" = 2 = 0.4
+# 𝑙𝑎 𝑠𝑙𝑠𝑎𝑙 𝑎𝑙𝑎𝑠𝑙𝑎𝑙𝑠𝑠 5
+
+These figures are our prior beliefs about any documents belonging to a certain class. Given any
+new document we believe that its probability of belonging it to education class is 60%.
+
+Now let us focus on the likelihood term. Let P(w |C) be the probability of word w occurring in a
+document of class C; the probability of w not occurring in a document of this class is given by
+(1−P(w |C)). If we make the naive Bayes assumption, that the probability of each word occurring
+in the document is independent of the occurrences of the other words, then we can write the
+document likelihood P(D | C) in terms of the individual word likelihoods P(w |C):
+P  , ,.... | C  = P(d|C) = |V| [ P( | C)  (1 )(1 P( | C)]
+w 1 w 2 w n  d i w i d i w i
+i1
+
+What is d in the above expression ?
+
+d = (𝒅 𝟎, 𝒅 𝟎, 𝒅 𝟎, 𝒅 𝟎, 𝒅 𝟎, 𝒅 𝟎, 𝒅 𝟎, 𝒅 𝟎, 𝒅 𝟎, 𝒅 𝟎𝟎, 𝒅 𝟎𝟎, 𝒅 𝟎𝟎 ) is a feature vector of any document.
+
+𝒅 𝒊 could be either “0” or “1”. When 𝒅 𝒊 =1 then(𝟎 − 𝒅 𝒊 )=0 and When  𝒅 𝒊 =0 then(𝟎 −
+𝒅 𝒊 )=1. That means any one of the terms d i P( w i | C) or (1 d i )(1 P( w i | C)in the  likelihood
+expression will be non-zero.This product goes over all words in the vocabulary. If word w i is
+present, then  𝒅 𝒊 =1 and the required probability is P( w i | C) ; if word w i is not present, then
+𝒅 𝒊 =0 and the required probability is 1 P( w i | C) .
+So how should we proceed to calculate likelihood of our test document “very good educational
+institution”. Its going to be different than how we calculated it for Multinomial Naïve Bayes. That
+might have been obvious from the likelihood equation for Bernoulli’s Naïve Bayes. We didn’tbother about feature vector of test document then. But now we need to transform our test
+document to a feature vector as we did for training documents. So feature vector for our test
+document will be
+
+d = (0,0,1,0,1,0,0,1,0,0,0,0) . It was to know what our feature vector would be. There are 4 words.
+
+First, we should ignore those words in the document which are not part of the dictionary. In this
+case the word “very” is not part of the dictionary so we should ignore it.We only need to consider
+remaining words which are “good” , “educational” and “institution” . Feature vector has three “1”
+corresponding to these words at 𝒅 𝟎, 𝒅 𝟎, and𝒅 𝟎, .All other values of feature vector are zero as
+these words don’t appear in our test document.
+
+d = (0,0,1,0,1,0,0,1,0,0,0,0)
+
+12
+P(education|d) ∝ P(education)  [ d i P( w i | C  education)  (1 d i )(1 P( w i | C  education))]
+i1
+
+∝ 𝟎 × 𝟎 × 𝟎 × 𝟎 × 𝟎 × 𝟎 × 𝟎 × 𝟎 × 𝟎 × 𝟎 × 𝟎 × 𝟎 × 𝟎
+𝟎 𝟎 𝟎 𝟎 𝟎 𝟎 𝟎 𝟎
+
+Let us see reasoning for few terms to understand the above expression.
+
+First term -> 𝟎
+𝟎
+This is prior for education and equal to P(education)
+
+Second term -> 1  First term 𝒅 𝟎, of the feature vector is 0 so we use
+(1 d i )(1 P( w i | C  education)) . By putting 𝒅 𝟎, =0 and P( w 1 | C  education) =0 we get 1
+Third term-> 𝟎 Second  term 𝒅 of the feature vector is 0 again so we again use
+𝟎 𝟎,
+𝟎
+(1 d i )(1 P( w i | C  education)) . By putting 𝒅 𝟎 =0 and P( w 2 | C  education) = 𝟎  form the
+probability table we get 𝟎 .
+𝟎
+
+Fourth term -> 𝟎 Third  term 𝒅 𝟎, of the feature vector is 1 a so we  use
+d i P( w i | C  education) . By putting 𝒅 𝟎 =1 and P( w 3 | C  education) =1 form the probability
+table we get 𝟎.Fifth term -> 𝟎 Fourth  term 𝒅 𝟎 of the feature vector is 0  so we again use
+𝟎
+𝟎
+(1 d i )(1 P( w i | C  education)) . By putting 𝒅 𝟎 =0 and P( w 4 | C  education) = 𝟎  form the
+probability table we get 𝟎 .
+𝟎
+
+Sixth term -> 0 . This is special and needs our extra attention. This will make the whole expression
+zero. Fifth term 𝒅 𝟎 of the feature vector is 1 a so we use d i P( w i | C  education) . By putting
+𝒅 𝟎 =1 and P( w 5 | C  education) =0 from the probability table we get 0 .
+
+There is no point for any further calculations. In Multinomial Naive Bayes we have already seen
+how to handle this. We use Laplace Smoothing. Formula of Laplace Smoothing for Bernoulli's Naive
+Bayes is a bit different and as follows.
+
+n C  w t  1
+P(𝒘 𝒕 | C)=
+N C  2
+n C  w t      is the number of documents in class C in which word w t    is present and
+
+N C             is total no of documents in class C .      Derivation of this formula is beyond the scope of
+this discussion. Let us use this formula to recalculate our probability table for dictionary words for
+different classes.
+
+n education  w  p  w | c  education  n cinema  w  p  w | c  cinema 
+
+𝑤 1 = cinema 0+1=1 1/(2+3)=1/5 1+1=2 2/(2+2)=1/2
+
+𝑤 2 = depends 1+1=2 2/(2+3)=2/5 1+1=2 2/(2+2)=1/2
+
+𝑤 3 = educational 3+1=4 4/(2+3)=4/5 0+1=1 1/(2+2)=1/4
+
+𝑤 4 = ethics 2+1=3 3/(2+3)=3/5 0+1=1 1/(2+2)=1/4
+
+𝑤 5 = good 0+1=1 1/(2+3)=1/5 2+1=3 3/(2+2)=3/4
+
+𝑤 6 = great 2+1=3 3/(2+3)=3/5 1+1=2 2/(2+2)=1/4
+
+𝑤 7 = greatness 2+1=3 3/(2+3)=3/5 0+1=1 1/(2+2)=1/4𝑤 8 = institution 1+1=2 2/(2+3)=2/5 0+1=1 1/(2+2)=1/4
+
+𝑤 9 = movie 0+1=1 1/(2+3)=1/5 1+1=2 2/(2+2)=1/2
+
+𝑤 10 = sholey 0+1=1 1/(2+3)=1/5 1+1=2 2/(2+2)=1/2
+
+𝑤 11 = story 1+1=2 2/(2+3)=2/5 1+1=2 2/(2+2)=1/2
+
+𝑤 12 = upgrad 1+1=2 2/(2+3)=2/5 0+1=1 1/(2+2)=1/4
+
+Now let us use this table to calculate the class of the test document which feature vector is given
+by  d = (0,0,1,0,1,0,0,1,0,0,0,0)
+
+We will use same formula and steps.
+
+12
+P(education|d) ∝ P(education)  [ d i P( w i | C  education)  (1 d i )(1 P( w i | C  education))]
+i1
+
+∝ 𝟎 × 𝟎 × 𝟎 × 𝟎 × 𝟎 × 𝟎 × 𝟎 × 𝟎 × 𝟎 × 𝟎 × 𝟎 × 𝟎 × 𝟎
+𝟎 𝟎 𝟎 𝟎 𝟎 𝟎 𝟎 𝟎 𝟎 𝟎 𝟎 𝟎 𝟎
+
+= 0.0002717908992
+
+12
+P(cinema|d) ∝ P(cinema)  [ d i P( w i | C  cinema)  (1 d i )(1 P( w i | C  cinema))]
+i1
+
+∝ 𝟎 × 𝟎 × 𝟎 × 𝟎 × 𝟎 × 𝟎 × 𝟎 × 𝟎 × 𝟎 × 𝟎 × 𝟎 × 𝟎 × 𝟎
+𝟎 𝟎 𝟎 𝟎 𝟎 𝟎 𝟎 𝟎 𝟎 𝟎 𝟎 𝟎 𝟎
+
+= 0.000185394287109375
+
+As P(education|d) > P(cinema|d)  we can conclude that the document belongs to "education"
+class.
+
+As you notice that the model of this variation is significantly different from Multinomial not only
+because it does not take into consideration the number of occurrences of each word, but also
+because it takes into account the non-occurring terms within the document. While in Multinomial
+model the non-occurring terms are completely ignored, in Bernoulli model they are factored when
+computing the conditional probabilities and thus the absence of terms is taken into account.
